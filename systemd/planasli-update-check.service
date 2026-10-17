@@ -1,0 +1,21 @@
+[Unit]
+Description=PlanAsli SSH Manager update check
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=planasli
+Group=planasli
+WorkingDirectory=/opt/planasli-ssh/current
+EnvironmentFile=/etc/planasli-ssh/planasli.env
+ExecStart=/opt/planasli-ssh/venv/bin/python -c "
+from app.core.database import SessionLocal
+from app.services.update_service import UpdateService
+db = SessionLocal()
+try:
+    svc = UpdateService(db)
+    status = svc.get_update_status()
+    print(status.get('status'), status.get('latest_version'))
+finally:
+    db.close()
+"

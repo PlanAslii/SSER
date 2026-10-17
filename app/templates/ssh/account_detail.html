@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ account.username }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <a href="/accounts" class="btn btn-secondary btn-sm">← {{ t('accounts') }}</a>
+  <a href="/accounts/{{ account.id }}/edit" class="btn btn-primary btn-sm">{{ t('edit') }}</a>
+</div>
+<div class="card" style="max-width:640px">
+  <div class="card-header"><h2 class="card-title font-mono">{{ account.username }}</h2>
+    <span class="badge badge-{% if account.effective_status == 'active' %}success{% elif account.effective_status == 'disabled' %}muted{% else %}warning{% endif %}">{{ t(account.effective_status) if account.effective_status in ['active','disabled','expired'] else account.effective_status }}</span>
+  </div>
+  <div class="card-body">
+    <table class="data-table">
+      <tr><td class="text-muted">{% if lang == 'fa' %}نام نمایشی{% else %}Display name{% endif %}</td><td>{{ account.display_name or '—' }}</td></tr>
+      <tr><td class="text-muted">Email</td><td>{{ account.email or '—' }}</td></tr>
+      <tr><td class="text-muted">UID / GID</td><td class="font-mono">{{ account.uid or '—' }} / {{ account.gid or '—' }}</td></tr>
+      <tr><td class="text-muted">{% if lang == 'fa' %}خانه{% else %}Home{% endif %}</td><td class="font-mono">{{ account.home_directory or '—' }}</td></tr>
+      <tr><td class="text-muted">Shell</td><td class="font-mono">{{ account.shell }}</td></tr>
+      <tr><td class="text-muted">{% if lang == 'fa' %}حداکثر نشست{% else %}Max sessions{% endif %}</td><td>{{ account.max_sessions }}</td></tr>
+      <tr><td class="text-muted">{% if lang == 'fa' %}انقضا{% else %}Expires{% endif %}</td><td>{{ account.expires_at or '—' }}</td></tr>
+      <tr><td class="text-muted">{% if lang == 'fa' %}آخرین ورود{% else %}Last login{% endif %}</td><td>{{ account.last_login_at or '—' }} {% if account.last_login_ip %}({{ account.last_login_ip }}){% endif %}</td></tr>
+      <tr><td class="text-muted">{% if lang == 'fa' %}ایجاد{% else %}Created{% endif %}</td><td>{{ account.created_at }} {% if account.created_by %}by {{ account.created_by }}{% endif %}</td></tr>
+      <tr><td class="text-muted">{% if lang == 'fa' %}یادداشت{% else %}Notes{% endif %}</td><td>{{ account.notes or '—' }}</td></tr>
+    </table>
+  </div>
+</div>
+{% endblock %}

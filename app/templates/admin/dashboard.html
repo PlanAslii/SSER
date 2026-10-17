@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{{ t('dashboard') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">{{ t('total_accounts') }}</div>
+    <div class="stat-value">{{ counts.get('active',0) + counts.get('disabled',0) + counts.get('expired',0) + counts.get('pending',0) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('active_accounts') }}</div>
+    <div class="stat-value">{{ counts.get('active', 0) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('expired_accounts') }}</div>
+    <div class="stat-value">{{ counts.get('expired', 0) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('disabled_accounts') }}</div>
+    <div class="stat-value">{{ counts.get('disabled', 0) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('current_sessions') }}</div>
+    <div class="stat-value">{{ active_sessions }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('cpu') }}</div>
+    <div class="stat-value">{{ "%.0f"|format(snapshot.cpu_percent) }}%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('memory') }}</div>
+    <div class="stat-value">{{ "%.0f"|format(snapshot.memory_percent) }}%</div>
+    <div class="stat-sub">{{ snapshot.memory_used_mb }} / {{ snapshot.memory_total_mb }} MB</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('disk') }}</div>
+    <div class="stat-value">{{ "%.0f"|format(snapshot.disk_percent) }}%</div>
+    <div class="stat-sub">{{ snapshot.disk_used_gb }} / {{ snapshot.disk_total_gb }} GB</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">{% if lang == 'fa' %}توزیع وضعیت حساب‌ها{% else %}Account status distribution{% endif %}</h2>
+    </div>
+    <div class="card-body">
+      <div class="chart-container">
+        <canvas id="statusChart" aria-label="Account status chart"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">{% if lang == 'fa' %}رویدادهای احراز هویت (۷ روز){% else %}Authentication events (7 days){% endif %}</h2>
+    </div>
+    <div class="card-body">
+      <div class="chart-container">
+        <canvas id="authChart" aria-label="Auth events chart"></canvas>
+      </div>
+      {% if not auth_chart.labels %}
+      <div class="empty-state"><p>{{ t('no_data') }}</p></div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const textColor = isDark ? '#a0a8bc' : '#5c6578';
+
+  const statusData = {{ status_chart | tojson }};
+  if (document.getElementById('statusChart')) {
+    new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: {
+        labels: statusData.labels,
+        datasets: [{
+          data: statusData.values,
+          backgroundColor: ['#1a9f6a', '#8b93a7', '#c47d0e'],
+          borderWidth: 0,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: textColor, boxWidth: 12 } } }
+      }
+    });
+  }
+
+  const authData = {{ auth_chart | tojson }};
+  if (document.getElementById('authChart') && authData.labels && authData.labels.length) {
+    new Chart(document.getElementById('authChart'), {
+      type: 'bar',
+      data: {
+        labels: authData.labels,
+        datasets: [
+          { label: '{% if lang == "fa" %}موفق{% else %}Success{% endif %}', data: authData.success, backgroundColor: '#1a9f6a' },
+          { label: '{% if lang == "fa" %}ناموفق{% else %}Failed{% endif %}', data: authData.failed, backgroundColor: '#d14343' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { ticks: { color: textColor }, grid: { color: gridColor } },
+          y: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true }
+        },
+        plugins: { legend: { labels: { color: textColor, boxWidth: 12 } } }
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}

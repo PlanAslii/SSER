@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ t('settings') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+{% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+{% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
+<div class="grid-2">
+<div class="card"><div class="card-header"><h2 class="card-title">Profile</h2></div>
+<div class="card-body">
+<form method="post" action="/settings/profile">
+<div class="form-group"><label class="form-label">Display name</label>
+<input class="form-input" name="display_name" value="{{ admin.display_name or '' }}"></div>
+<div class="form-group"><label class="form-label">{{ t('language') }}</label>
+<select class="form-select" name="language"><option value="fa" {% if admin.language=='fa' %}selected{% endif %}>فارسی</option>
+<option value="en" {% if admin.language=='en' %}selected{% endif %}>English</option></select></div>
+<div class="form-group"><label class="form-label">Theme</label>
+<select class="form-select" name="theme">
+<option value="light" {% if admin.theme=='light' %}selected{% endif %}>{{ t('theme_light') }}</option>
+<option value="dark" {% if admin.theme=='dark' %}selected{% endif %}>{{ t('theme_dark') }}</option>
+<option value="system" {% if admin.theme=='system' %}selected{% endif %}>{{ t('theme_system') }}</option>
+</select></div>
+<button type="submit" class="btn btn-primary">{{ t('save') }}</button>
+</form></div></div>
+<div class="card"><div class="card-header"><h2 class="card-title">Change password</h2></div>
+<div class="card-body">
+<form method="post" action="/settings/password">
+<div class="form-group"><label class="form-label">Current password</label><input class="form-input" type="password" name="current_password" required></div>
+<div class="form-group"><label class="form-label">New password</label><input class="form-input" type="password" name="new_password" required minlength="8"></div>
+<div class="form-group"><label class="form-label">Confirm</label><input class="form-input" type="password" name="confirm_password" required></div>
+<button type="submit" class="btn btn-primary">{{ t('save') }}</button>
+</form></div></div>
+</div>
+<div class="card mt-4"><div class="card-header"><h2 class="card-title">Update settings</h2></div>
+<div class="card-body">
+<p class="text-sm text-muted">GitHub: <span class="font-mono">{{ settings.github_owner }}/{{ settings.github_repo }}</span> · Channel: {{ settings.release_channel }}</p>
+<p class="text-sm text-muted">Auto-check: {{ settings.auto_update_check_enabled }} · Interval: {{ settings.update_check_interval_hours }}h · Unattended install: {{ settings.unattended_install_enabled }}</p>
+</div></div>
+{% endblock %}

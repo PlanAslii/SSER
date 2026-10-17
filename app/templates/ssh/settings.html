@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}{{ t('ssh_settings') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="card"><div class="card-header"><h2 class="card-title">{{ t('ssh_settings') }}</h2></div>
+<div class="card-body"><p class="text-muted">SSH daemon configuration management. Changes are validated before applying and can be rolled back.</p></div></div>
+{% endblock %}

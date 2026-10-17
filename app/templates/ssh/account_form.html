@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'create' %}{{ t('create') }}{% else %}{{ t('edit') }}{% endif %} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:560px">
+  <div class="card-header">
+    <h2 class="card-title">{% if mode == 'create' %}{% if lang == 'fa' %}ایجاد حساب SSH{% else %}Create SSH Account{% endif %}{% else %}{% if lang == 'fa' %}ویرایش حساب{% else %}Edit Account{% endif %}{% endif %}</h2>
+  </div>
+  <div class="card-body">
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    <form method="post" action="{% if mode == 'create' %}/accounts/create{% else %}/accounts/{{ account.id }}/edit{% endif %}">
+      {% if mode == 'create' %}
+      <div class="form-group">
+        <label class="form-label" for="username">{{ t('username') }}</label>
+        <input class="form-input" type="text" id="username" name="username" required pattern="[a-zA-Z0-9_\-]+" minlength="2">
+      </div>
+      {% endif %}
+      <div class="form-group">
+        <label class="form-label" for="password">{{ t('password') }}{% if mode == 'edit' %} <span class="text-muted">({% if lang == 'fa' %}خالی = بدون تغییر{% else %}leave blank to keep{% endif %})</span>{% endif %}</label>
+        <input class="form-input" type="password" id="password" name="password" {% if mode == 'create' %}{% endif %} autocomplete="new-password">
+      </div>
+      {% if mode == 'create' %}
+      <div class="form-group">
+        <label class="form-label" for="public_key">{% if lang == 'fa' %}کلید عمومی{% else %}Public key{% endif %}</label>
+        <textarea class="form-textarea" id="public_key" name="public_key" rows="3" placeholder="ssh-ed25519 AAAA…"></textarea>
+      </div>
+      {% endif %}
+      <div class="form-group">
+        <label class="form-label" for="display_name">{% if lang == 'fa' %}نام نمایشی{% else %}Display name{% endif %}</label>
+        <input class="form-input" type="text" id="display_name" name="display_name" value="{{ account.display_name if account else '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" type="email" id="email" name="email" value="{{ account.email if account else '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="max_sessions">{% if lang == 'fa' %}حداکثر نشست{% else %}Max sessions{% endif %}</label>
+        <input class="form-input" type="number" id="max_sessions" name="max_sessions" min="1" max="50" value="{{ account.max_sessions if account else 5 }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="expires_at">{% if lang == 'fa' %}تاریخ انقضا{% else %}Expires at{% endif %}</label>
+        <input class="form-input" type="datetime-local" id="expires_at" name="expires_at" value="{{ account.expires_at.strftime('%Y-%m-%dT%H:%M') if account and account.expires_at else '' }}">
+      </div>
+      {% if mode == 'edit' %}
+      <div class="form-group">
+        <label class="form-label" for="status">{{ t('status') }}</label>
+        <select class="form-select" id="status" name="status">
+          <option value="active" {% if account.status == 'active' %}selected{% endif %}>{{ t('active') }}</option>
+          <option value="disabled" {% if account.status == 'disabled' %}selected{% endif %}>{{ t('disabled') }}</option>
+        </select>
+      </div>
+      {% endif %}
+      <div class="form-group">
+        <label class="form-label" for="notes">{% if lang == 'fa' %}یادداشت{% else %}Notes{% endif %}</label>
+        <textarea class="form-textarea" id="notes" name="notes" rows="2">{{ account.notes if account else '' }}</textarea>
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="btn btn-primary">{{ t('save') }}</button>
+        <a href="/accounts" class="btn btn-secondary">{{ t('cancel') }}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ t('admin_security') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="card"><div class="card-header"><h2 class="card-title">{{ t('admin_security') }}</h2></div>
+<div class="card-body">
+<p class="text-sm">Session timeout, failed login lockout, and IP restrictions are enforced.</p>
+<ul class="text-sm text-muted" style="margin-top:1rem;padding-inline-start:1.25rem">
+<li>Failed login lockout after 5 attempts (15 minutes)</li>
+<li>Session cookie: HttpOnly, SameSite=Lax</li>
+<li>Panel binds to localhost by default</li>
+</ul>
+</div></div>
+{% endblock %}

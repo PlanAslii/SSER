@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# PlanAsli restricted privileged helper.
+# Allowlisted operations only. No arbitrary command execution.
+set -euo pipefail
+
+ALLOWED_OPS=("restart-service" "reload-sshd" "create-user" "lock-user" "unlock-user" "set-password" "delete-user")
+
+op="${1:-}"
+shift || true
+
+case "${op}" in
+  restart-service)
+    systemctl restart planasli-ssh.service
+    ;;
+  reload-sshd)
+    systemctl reload sshd 2>/dev/null || systemctl reload ssh 2>/dev/null || true
+    ;;
+  create-user)
+    # Args: username home shell
+    username="${1:?}"
+    home="${2:?}"
+    shell="${3:-/bin/bash}"
+    [[ "${username}" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || { echo "Invalid username"; exit 1; }
+    useradd -m -d "${home}" -s "${shell}" "${username}"
+    ;;
+  lock-user)
+    username="${1:?}"
+    [[ "${username}" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || exit 1
+    usermod -L "${username}"
+    usermod -s /usr/sbin/nologin "${username}"
+    ;;
+  unlock-user)
+    username="${1:?}"
+    [[ "${username}" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || exit 1
+    usermod -U "${username}"
+    usermod -s /bin/bash "${username}"
+    ;;
+  set-password)
+    username="${1:?}"
+    [[ "${username}" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || exit 1
+    # Password read from stdin only
+    chpasswd
+    ;;
+  delete-user)
+    username="${1:?}"
+    [[ "${username}" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || exit 1
+    userdel -r "${username}" 2>/dev/null || userdel "${username}"
+    ;;
+  *)
+    echo "Usage: planasli-update-helper <op> [args]"
+    echo "Allowed: ${ALLOWED_OPS[*]}"
+    exit 1
+    ;;
+esac

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ t('updates') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+{% set st = update_status %}
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">{{ t('installed_version') }}</div>
+    <div class="stat-value" style="font-size:1.25rem">{{ st.installed_version }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('latest_version') }}</div>
+    <div class="stat-value" style="font-size:1.25rem">{{ st.latest_version or '—' }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('status') }}</div>
+    <div class="stat-value" style="font-size:1rem">
+      {% if st.setup_required %}
+      <span class="badge badge-warning">Setup required</span>
+      {% elif st.update_available %}
+      <span class="badge badge-info">{{ t('update_available') }}</span>
+      {% else %}
+      <span class="badge badge-success">{{ t('up_to_date') }}</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">{{ t('last_check') }}</div>
+    <div class="stat-value" style="font-size:0.9rem">{{ st.last_check or '—' }}</div>
+  </div>
+</div>
+{% if st.setup_required %}
+<div class="alert alert-info">{{ st.message }}</div>
+{% elif st.message %}
+<div class="alert alert-warning">{{ st.message }}</div>
+{% endif %}
+<div class="toolbar">
+  <form method="post" action="/updates/check"><button type="submit" class="btn btn-secondary">{{ t('check_updates') }}</button></form>
+  {% if st.update_available %}
+  <form method="post" action="/updates/install" onsubmit="return confirm('Confirm install?')"><button type="submit" class="btn btn-primary">{{ t('install_update') }}</button></form>
+  {% endif %}
+  <a href="/updates/history" class="btn btn-ghost">History</a>
+</div>
+{% if st.release_notes %}
+<div class="card mt-4"><div class="card-header"><h2 class="card-title">{{ t('release_notes') }}</h2></div>
+<div class="card-body"><pre style="white-space:pre-wrap;font-size:0.8125rem">{{ st.release_notes }}</pre></div></div>
+{% endif %}
+{% if history %}
+<div class="card mt-4"><div class="card-header"><h2 class="card-title">Recent</h2></div>
+<div class="table-wrap"><table class="data-table"><thead><tr><th>Version</th><th>Status</th><th>By</th><th>Time</th></tr></thead>
+<tbody>{% for h in history %}<tr><td class="font-mono">{{ h.previous_version }} → {{ h.new_version or h.requested_version }}</td>
+<td><span class="badge badge-{% if h.status == 'successful' %}success{% elif h.status == 'failed' %}danger{% else %}info{% endif %}">{{ h.status }}</span></td>
+<td>{{ h.initiated_by }}</td><td class="text-sm">{{ h.start_time }}</td></tr>{% endfor %}</tbody></table></div></div>
+{% endif %}
+{% endblock %}

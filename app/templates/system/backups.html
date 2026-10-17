@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ t('backups') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="card"><div class="card-header"><h2 class="card-title">{{ t('backups') }}</h2></div>
+<div class="table-wrap"><table class="data-table"><thead><tr><th>Name</th><th>Size</th></tr></thead>
+<tbody>{% for b in backups %}<tr><td class="font-mono">{{ b.name }}</td><td>{{ b.size or '—' }}</td></tr>
+{% else %}<tr><td colspan="2"><div class="empty-state">{{ t('no_data') }}</div></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

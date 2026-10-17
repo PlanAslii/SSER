@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ t('accounts') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="toolbar">
+  <form method="get" action="/accounts" class="flex gap-2" style="flex:1">
+    <input type="search" name="q" class="form-input" placeholder="{{ t('search') }}…" value="{{ search }}">
+    <select name="status" class="form-select" style="width:auto">
+      <option value="">{% if lang == 'fa' %}همه{% else %}All{% endif %}</option>
+      <option value="active" {% if status_filter == 'active' %}selected{% endif %}>{{ t('active') }}</option>
+      <option value="disabled" {% if status_filter == 'disabled' %}selected{% endif %}>{{ t('disabled') }}</option>
+      <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>{{ t('expired') }}</option>
+    </select>
+    <button type="submit" class="btn btn-secondary">{{ t('search') }}</button>
+  </form>
+  <a href="/accounts/create" class="btn btn-primary">{{ t('create') }}</a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>{{ t('username') }}</th>
+          <th>{% if lang == 'fa' %}نام{% else %}Name{% endif %}</th>
+          <th>{{ t('status') }}</th>
+          <th>{% if lang == 'fa' %}انقضا{% else %}Expires{% endif %}</th>
+          <th>{% if lang == 'fa' %}ایجاد{% else %}Created{% endif %}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in accounts %}
+        <tr>
+          <td class="font-mono"><a href="/accounts/{{ a.id }}">{{ a.username }}</a></td>
+          <td>{{ a.display_name or '—' }}</td>
+          <td>
+            {% set st = a.effective_status %}
+            <span class="badge badge-{% if st == 'active' %}success{% elif st == 'disabled' %}muted{% else %}warning{% endif %}">
+              {{ t(st) if st in ['active','disabled','expired'] else st }}
+            </span>
+          </td>
+          <td class="text-sm text-muted">{{ a.expires_at.strftime('%Y-%m-%d') if a.expires_at else '—' }}</td>
+          <td class="text-sm text-muted">{{ a.created_at.strftime('%Y-%m-%d') if a.created_at else '—' }}</td>
+          <td>
+            <div class="flex gap-2">
+              <a href="/accounts/{{ a.id }}/edit" class="btn btn-ghost btn-sm">{{ t('edit') }}</a>
+              {% if a.status == 'active' %}
+              <form method="post" action="/accounts/{{ a.id }}/disable" style="display:inline" onsubmit="return confirm('{{ t('confirm_delete') }}')">
+                <button type="submit" class="btn btn-ghost btn-sm">{{ t('disabled') }}</button>
+              </form>
+              {% else %}
+              <form method="post" action="/accounts/{{ a.id }}/enable" style="display:inline">
+                <button type="submit" class="btn btn-ghost btn-sm">{{ t('active') }}</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6"><div class="empty-state">{{ t('no_data') }}</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if pages > 1 %}
+<div class="pagination">
+  {% if current_page > 1 %}
+  <a class="btn btn-secondary btn-sm" href="?page={{ current_page - 1 }}&q={{ search }}&status={{ status_filter }}">←</a>
+  {% endif %}
+  <span class="text-sm text-muted">{{ current_page }} / {{ pages }}</span>
+  {% if current_page < pages %}
+  <a class="btn btn-secondary btn-sm" href="?page={{ current_page + 1 }}&q={{ search }}&status={{ status_filter }}">→</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

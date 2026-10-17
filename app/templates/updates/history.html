@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Update History — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="toolbar"><a href="/updates" class="btn btn-secondary btn-sm">← {{ t('updates') }}</a></div>
+<div class="card"><div class="table-wrap"><table class="data-table">
+<thead><tr><th>Requested</th><th>Previous</th><th>New</th><th>Status</th><th>Stage</th><th>By</th><th>Start</th><th>End</th><th>Error</th></tr></thead>
+<tbody>{% for h in history %}<tr>
+<td class="font-mono">{{ h.requested_version }}</td><td class="font-mono">{{ h.previous_version }}</td><td class="font-mono">{{ h.new_version or '—' }}</td>
+<td><span class="badge badge-{% if h.status == 'successful' %}success{% elif 'fail' in h.status %}danger{% else %}info{% endif %}">{{ h.status }}</span></td>
+<td class="text-sm">{{ h.stage or '—' }}</td><td>{{ h.initiated_by }}</td><td class="text-sm">{{ h.start_time }}</td><td class="text-sm">{{ h.completion_time or '—' }}</td>
+<td class="text-sm text-muted">{{ h.failure_reason or '—' }}</td></tr>
+{% else %}<tr><td colspan="9"><div class="empty-state">{{ t('no_data') }}</div></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ t('auth_logs') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>{{ t('username') }}</th><th>IP</th><th>{{ t('status') }}</th><th>{% if lang == 'fa' %}روش{% else %}Method{% endif %}</th><th>{% if lang == 'fa' %}زمان{% else %}Time{% endif %}</th></tr></thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td class="font-mono">{{ log.username or '—' }}</td>
+          <td class="font-mono">{{ log.remote_ip or '—' }}</td>
+          <td><span class="badge badge-{% if log.success %}success{% else %}danger{% endif %}">{% if log.success %}{% if lang == 'fa' %}موفق{% else %}OK{% endif %}{% else %}{% if lang == 'fa' %}ناموفق{% else %}Fail{% endif %}{% endif %}</span></td>
+          <td class="text-sm">{{ log.method or '—' }}</td>
+          <td class="text-sm">{{ log.created_at }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5"><div class="empty-state">{{ t('no_data') }}</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

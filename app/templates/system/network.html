@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ t('network_settings') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="card"><div class="card-header"><h2 class="card-title">{{ t('network_settings') }}</h2></div>
+<div class="card-body"><p class="text-muted">{% if lang == 'fa' %}تشخیص شبکه و پیکربندی فایروال از این صفحه مدیریت می‌شود. پنل به‌صورت پیش‌فرض فقط به localhost متصل است.{% else %}Network diagnostics and firewall configuration. Panel binds to localhost by default.{% endif %}</p>
+<div class="alert alert-info mt-4">Bind: 127.0.0.1:8080 (default). Use a reverse proxy for public access.</div>
+</div></div>
+{% endblock %}

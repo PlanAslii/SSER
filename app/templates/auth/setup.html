@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Setup — {{ t('app_name') }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <h1 class="auth-title">{{ t('app_name') }}</h1>
+      <p class="auth-subtitle">{% if lang == 'fa' %}راه‌اندازی اولیه مدیر{% else %}First-time administrator setup{% endif %}</p>
+      {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
+      <form method="post" action="/setup">
+        <div class="form-group">
+          <label class="form-label" for="username">{{ t('username') }}</label>
+          <input class="form-input" type="text" id="username" name="username" required minlength="3" autocomplete="username" autofocus>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="display_name">{% if lang == 'fa' %}نام نمایشی{% else %}Display name{% endif %}</label>
+          <input class="form-input" type="text" id="display_name" name="display_name" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">{{ t('password') }}</label>
+          <input class="form-input" type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password_confirm">{% if lang == 'fa' %}تکرار رمز عبور{% else %}Confirm password{% endif %}</label>
+          <input class="form-input" type="password" id="password_confirm" name="password_confirm" required minlength="8" autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">{% if lang == 'fa' %}ایجاد حساب مدیر{% else %}Create administrator{% endif %}</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

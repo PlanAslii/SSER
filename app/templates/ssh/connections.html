@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ t('active_connections') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>{{ t('username') }}</th><th>IP</th><th>PID</th><th>{% if lang == 'fa' %}شروع{% else %}Started{% endif %}</th><th>{% if lang == 'fa' %}کلاینت{% else %}Client{% endif %}</th></tr></thead>
+      <tbody>
+        {% for c in connections %}
+        <tr>
+          <td class="font-mono">{{ c.username }}</td>
+          <td class="font-mono">{{ c.remote_ip or '—' }}{% if c.remote_port %}:{{ c.remote_port }}{% endif %}</td>
+          <td class="font-mono">{{ c.pid or '—' }}</td>
+          <td class="text-sm">{{ c.started_at }}</td>
+          <td class="text-sm text-muted">{{ c.client_info or '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5"><div class="empty-state">{{ t('no_data') }}</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

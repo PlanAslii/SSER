@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ t('server_monitoring') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="stat-grid">
+  <div class="stat-card"><div class="stat-label">{{ t('cpu') }}</div><div class="stat-value">{{ "%.1f"|format(snapshot.cpu_percent) }}%</div></div>
+  <div class="stat-card"><div class="stat-label">{{ t('memory') }}</div><div class="stat-value">{{ "%.1f"|format(snapshot.memory_percent) }}%</div><div class="stat-sub">{{ snapshot.memory_used_mb }} / {{ snapshot.memory_total_mb }} MB</div></div>
+  <div class="stat-card"><div class="stat-label">{{ t('disk') }}</div><div class="stat-value">{{ "%.1f"|format(snapshot.disk_percent) }}%</div><div class="stat-sub">{{ snapshot.disk_used_gb }} / {{ snapshot.disk_total_gb }} GB</div></div>
+</div>
+<div class="card"><div class="card-header"><h2 class="card-title">CPU / Memory (24h)</h2></div>
+<div class="card-body"><div class="chart-container"><canvas id="metricsChart"></canvas></div>
+{% if not chart.labels %}<div class="empty-state">{{ t('no_data') }}</div>{% endif %}
+</div></div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+const d = {{ chart | tojson }};
+if (d.labels && d.labels.length) {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const tc = isDark ? '#a0a8bc' : '#5c6578';
+  const gc = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  new Chart(document.getElementById('metricsChart'), {
+    type: 'line',
+    data: { labels: d.labels, datasets: [
+      { label: 'CPU %', data: d.cpu, borderColor: '#3b6ef5', tension: 0.3, pointRadius: 0 },
+      { label: 'Memory %', data: d.memory, borderColor: '#1a9f6a', tension: 0.3, pointRadius: 0 }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false,
+      scales: { x: { ticks: { color: tc, maxTicksLimit: 12 }, grid: { color: gc } },
+                y: { ticks: { color: tc }, grid: { color: gc }, beginAtZero: true, max: 100 } },
+      plugins: { legend: { labels: { color: tc } } } }
+  });
+}
+</script>
+{% endblock %}

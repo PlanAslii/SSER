@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ t('activity_audit') }} — {{ t('app_name') }}{% endblock %}
+{% block content %}
+<div class="card"><div class="table-wrap"><table class="data-table">
+<thead><tr><th>Actor</th><th>Action</th><th>Resource</th><th>Details</th><th>Time</th></tr></thead>
+<tbody>{% for e in events %}<tr>
+<td>{{ e.actor }}</td><td class="font-mono">{{ e.action }}</td><td>{{ e.resource_type }} {{ e.resource_id or '' }}</td>
+<td class="text-sm">{{ e.details or '—' }}</td><td class="text-sm">{{ e.created_at }}</td></tr>
+{% else %}<tr><td colspan="5"><div class="empty-state">{{ t('no_data') }}</div></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}
